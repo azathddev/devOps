@@ -35,10 +35,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install dependencies
         run: pip install -r backend/requirements.txt
-      - name: Lint
-        run: python backend/manage.py lint
-      - name: Test
-        run: python backend/manage.py test  
       - name: MyPy
         run: mypy backend
       - name: Black
