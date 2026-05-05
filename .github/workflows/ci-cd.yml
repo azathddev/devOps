@@ -2,7 +2,11 @@ name: CI/CD
 
 on:
   push:
-    branches: [master]
+    branches:
+     - master
+  pull_request:
+    branches:
+      - master
   workflow_dispatch:
 
 concurrency:
@@ -18,7 +22,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
       - name: Install dependencies
         run: npm --prefix frontend ci
       - name: Lint
@@ -33,7 +37,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
       - name: Install dependencies
         run: npm --prefix frontend ci
       - name: Build
