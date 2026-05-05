@@ -46,5 +46,3 @@ export function deleteTransaction(id: string): Promise<void> {
     method: 'DELETE',
   })
 }
-
-npm run dev -- --host 0.0.0.0
