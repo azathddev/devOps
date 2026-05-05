@@ -1,0 +1,62 @@
+services:
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+    networks:
+      - api_network
+    command: >
+      sh -c "python manage.py makemigrations &&
+              python manage.py migrate &&
+              python manage.py runserver 0.0.0.0:8000"
+    environment:
+      - DEBUG=${DJANGO_DEBUG:-True}
+      - SECRET_KEY=${DJANGO_SECRET_KEY:-CHANGEMECHANGEME}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-postgres}
+      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "python", "-c", "import urllib.request; print(None if urllib.request.urlopen('http://localhost:8000/api/health-check').status == 200 else 0/0)" ]
+      start_period: 10s
+      timeout: 10s
+      interval: 30s
+  db:
+    container_name: db
+    image: postgres:18
+    networks:
+      - api_network
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-postgres}
+      - POSTGRES_HOST=localhost
+      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+    volumes:
+      - pg_data:/var/lib/postgresql/18/main
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      start_period: 10s
+      timeout: 10s
+      interval: 30s
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+    command: npm run dev -- --host 0.0.0.0
+    environment:
+      - API_BASE_URL=${API_BASE_URL:-localhost}
+    ports:
+      - "${FRONTEND_PORT:-3000}:5173"
+    networks:
+      - api_network
+volumes:
+  pg_data:
+networks:
+  api_network:
+    driver: bridge
