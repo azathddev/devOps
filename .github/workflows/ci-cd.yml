@@ -36,7 +36,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r backend/requirements.txt
       - name: MyPy
-        run: mypy backend
+        run: mypy --config-file mypy.ini backend
       - name: Black
         run: black backend
       - name: Ruff
