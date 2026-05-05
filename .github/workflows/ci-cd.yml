@@ -51,7 +51,7 @@ jobs:
 
   deploy-production:
     name: Deploy Production
-    runs-on: [self-hosted, prod]
+    runs-on: [self-hosted]
     needs:
       - docker-build
     steps:
