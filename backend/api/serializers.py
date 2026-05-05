@@ -10,9 +10,9 @@ class RegisterSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         user = User.objects.create_user(
-            username=validated_data['email'],
-            password=validated_data['password'],
-            first_name=validated_data['name']
+            username=validated_data["email"],
+            password=validated_data["password"],
+            first_name=validated_data["name"],
         )
         return user
 
@@ -21,13 +21,11 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
 
+
 class TransactionSerializer(serializers.ModelSerializer):
     amount = serializers.IntegerField()
+
     class Meta:
         model = Transaction
         fields = "__all__"
-        read_only_fields = [
-            "id",
-            "createdAt",
-            "updatedAt"
-        ]
+        read_only_fields = ["id", "createdAt", "updatedAt"]

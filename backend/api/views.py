@@ -8,16 +8,13 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from api.models import Transaction
-from api.serializers import TransactionSerializer,RegisterSerializer, LoginSerializer
+from api.serializers import TransactionSerializer, RegisterSerializer, LoginSerializer
 
 
 @api_view(["GET"])
 def health_check(request):
-    return Response(
-        {
-            'detail': 'ok'
-        }
-    )
+    return Response({"detail": "ok"})
+
 
 @api_view(["POST"])
 def register(request):
@@ -27,13 +24,10 @@ def register(request):
     token, created = Token.objects.get_or_create(user=user)
     return Response(
         {
-                "accessToken": token.key,
-                "user": {
-                    "id": user.id,
-                    "email": user.username,
-                    "name": user.first_name
-                }
-        }, status=201
+            "accessToken": token.key,
+            "user": {"id": user.id, "email": user.username, "name": user.first_name},
+        },
+        status=201,
     )
 
 
@@ -42,29 +36,25 @@ def login(request):
     serializer = LoginSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     data = serializer.validated_data
-    user = authenticate(
-        username=data['email'],
-        password=data['password']
-    )
+    user = authenticate(username=data["email"], password=data["password"])
     if not user:
-        return Response({
-          "message": "Credentials not provided",
-          "code": "CREDENTIALS_NOT_PROVIDED",
-          "errors": {
-            "login": ["email or password doesn't correct"]
-          }
-        }, status=401)
+        return Response(
+            {
+                "message": "Credentials not provided",
+                "code": "CREDENTIALS_NOT_PROVIDED",
+                "errors": {"login": ["email or password doesn't correct"]},
+            },
+            status=401,
+        )
     token, created = Token.objects.get_or_create(user=user)
     return Response(
         {
             "accessToken": token.key,
-            "user": {
-                "id": user.id,
-                "email": user.username,
-                "name": user.first_name
-            }
-        }, status=200
+            "user": {"id": user.id, "email": user.username, "name": user.first_name},
+        },
+        status=200,
     )
+
 
 @api_view(["GET"])
 def me(request):
@@ -73,18 +63,18 @@ def me(request):
             {
                 "id": request.user.id,
                 "email": request.user.username,
-                "name": request.user.first_name
+                "name": request.user.first_name,
             }
         )
     return Response(
         {
             "message": "Not authenticated",
             "code": "NOT_AUTHENTICATED",
-            "errors": {
-                "login": ["authentication ne proiden"]
-            }
-        }, status=401
+            "errors": {"login": ["authentication ne proiden"]},
+        },
+        status=401,
     )
+
 
 class TransactionViewSet(viewsets.ModelViewSet):
     queryset = Transaction.objects.all()
@@ -106,10 +96,13 @@ class TransactionViewSet(viewsets.ModelViewSet):
             {
                 "items": response.data,
                 "summary": {
-                    "incomeTotal": queryset.filter(type="income").aggregate(Sum("amount"))["amount__sum"],
-                    "expenseTotal": queryset.filter(type="expense").aggregate(Sum("amount"))["amount__sum"],
+                    "incomeTotal": queryset.filter(type="income").aggregate(
+                        Sum("amount")
+                    )["amount__sum"],
+                    "expenseTotal": queryset.filter(type="expense").aggregate(
+                        Sum("amount")
+                    )["amount__sum"],
                     "balance": queryset.aggregate(Sum("amount"))["amount__sum"],
-                }
+                },
             }
         )
-
